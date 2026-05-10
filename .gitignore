@@ -2,12 +2,11 @@
 #///////////////////////////
 # Cocos Creator 3D Project
 #///////////////////////////
-library/
-temp/
-local/
-build/
-profiles/
-build/
+/library/
+/temp/
+/local/
+/build/
+/profiles/
 .DS_Store
 native
 #//////////////////////////
