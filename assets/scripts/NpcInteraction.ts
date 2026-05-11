@@ -10,6 +10,10 @@ import {
   Label,
 } from "cc";
 const { ccclass, property } = _decorator;
+interface DialogueData {
+  name: string;
+  text: string[];
+}
 
 @ccclass("NpcInteraction")
 export class NpcInteraction extends Component {
@@ -30,28 +34,48 @@ export class NpcInteraction extends Component {
     input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
   }
 
+  private dialogueData: DialogueData = {
+    name: "Flowey",
+    text: ["Chara Is You?", "It's me, Your Best Friend", "ASRIAL DREEMERR"],
+  };
+  private currentLine: number = 0;
+  private isTalking: boolean = false;
+
   onKeyDown(event: EventKeyboard) {
     console.log("Pressed", event.keyCode);
     //互動鍵
     if (event.keyCode === KeyCode.KEY_Z) {
-      this.checkDistance();
+      if (!this.isTalking) {
+        let dist = Vec3.distance(this.node.position, this.player.position);
+        if (dist < this.interactDistance) {
+          this.startDialogue();
+        }
+      } else {
+        this.nextSubLine();
+      }
     }
   }
-  checkDistance() {
-    //計算主角與NPC的距離
-    let dist = Vec3.distance(this.node.position, this.player.position);
 
-    console.log("The Distance is", dist);
+  startDialogue() {
+    this.isTalking = true;
+    this.currentLine = 0;
+    this.dialogueBox.active = true;
+    this.updateUI();
+  }
 
-    if (dist < this.interactDistance) {
-      console.log("Touch Completely");
-      this.showDialogue("The talking flower");
+  nextSubLine() {
+    this.currentLine++;
+    if (this.currentLine < this.dialogueData.text.length) {
+      this.updateUI();
     } else {
-      console.log("No Touched");
+      this.isTalking = false;
+      this.dialogueBox.active = false;
     }
   }
-  showDialogue(text: string) {
-    this.dialogueBox.active = true; //顯示對話框
-    this.contentLabel.string = text;
+
+  updateUI() {
+    const name = this.dialogueData.name;
+    const content = this.dialogueData.text[this.currentLine];
+    this.contentLabel.string = `${name}: ${content}`;
   }
 }
